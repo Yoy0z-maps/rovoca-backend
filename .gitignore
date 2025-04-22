@@ -73,3 +73,12 @@ coverage.xml
 .env.development.local
 .env.test.local
 .env.production.local
+
+# SSL
+*.pem
+*.key
+*.crt
+*.csr
+*.csr.pem
+*.csr.pem.key
+*.csr.pem.crt
