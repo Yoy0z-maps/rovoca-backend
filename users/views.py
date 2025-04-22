@@ -36,6 +36,8 @@ def verify_apple_token(identity_token: str):
         issuer="https://appleid.apple.com"
     )
 
+    print(decoded)
+
     return {
         "id": decoded["sub"],
         "email": decoded.get("email")

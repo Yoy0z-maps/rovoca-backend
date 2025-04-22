@@ -34,6 +34,9 @@ MEDIA_URL = "https://yoy0z-maps-blog-bucket.s3.ap-northeast-2.amazonaws.com/"
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
 
+# Custom User Model
+AUTH_USER_MODEL = "users.User"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
@@ -41,10 +44,10 @@ ALLOWED_HOSTS = ['54.180.57.195', '127.0.0.1', 'localhost', 'api.rovoca.site']
 
 
 REST_FRAMEWORK = {
-    # 토큰 인증 활성화
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
+    # JWT 인증 활성화
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
     # 필터 백엔드 활성화
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -175,3 +178,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# JWT 설정
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
