@@ -183,7 +183,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # JWT 설정
 from datetime import timedelta
 
+# RS256 알고리즘 사용
+with open('private.pem', 'r') as key_file:
+    PRIVATE_KEY = key_file.read()
+
+with open('public.pem', 'r') as key_file:
+    PUBLIC_KEY = key_file.read()
+
 SIMPLE_JWT = {
+    "ALGORITHM": "RS256",
+    "SIGNING_KEY": PRIVATE_KEY,
+    "VERIFYING_KEY": PUBLIC_KEY,
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "AUTH_HEADER_TYPES": ("Bearer",),
