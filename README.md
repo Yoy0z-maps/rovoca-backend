@@ -1,5 +1,32 @@
 # Social Login 응답 JSON
 
+- Kakao Authentication
+
+```json
+// API 응답결과
+{
+  "accessToken": "kqqKCpFsUJR",
+  "accessTokenExpiresAt": 1746496678.8926458,
+  "accessTokenExpiresIn": 43199,
+  "idToken": "eyJraWQl8tp_sJM_ENwUanTq-qbyksyZXTtEv-ocfSE9DDSS6ZlQ",
+  "refreshToken": "NoKcgIocdXwhKCpFsUJR",
+  "refreshTokenExpiresAt": 1751637478.892648,
+  "refreshTokenExpiresIn": 5183999,
+  "scopes": [],
+  "tokenType": "bearer"
+}
+
+// idToken BASE64 Decoding
+{
+  "aud": "NATIVE_APP_KEY",
+  "sub": "user_unique_id",
+  "auth_time": 1746453479,
+  "iss": "https://kauth.kakao.com",
+  "exp": 1746496679,
+  "iat": 1746453479
+}
+```
+
 - Apple Authentication
 
 ```json
@@ -21,7 +48,7 @@
   "user": "324.....2312"
 }
 
-// identityToken Decoding 결과
+// identityToken BASE64 Decoding
 {
     "iss": "https://appleid.apple.com",
     "aud": "....",
