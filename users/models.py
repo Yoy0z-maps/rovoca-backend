@@ -18,6 +18,10 @@ class User(AbstractUser):
     profile_image = models.URLField(null=True, blank=True) # 추후 프로필 이미지 업로드 시 사용
     created_at = models.DateTimeField(auto_now_add=True)
 
+    score = models.IntegerField(default=0)
+    last_active_date = models.DateField(null=True, blank=True)
+    streak = models.IntegerField(default=0)
+
     USERNAME_FIELD = "social_id"
     REQUIRED_FIELDS = []  # createsuperuser 만들 때 꼭 있어야 함
 
