@@ -2,6 +2,7 @@
 
 import requests
 import jwt
+from jwt import PyJWKClient
 from jwt.algorithms import RSAAlgorithm
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -14,6 +15,36 @@ from .serializers import UserSerializer
 
 APPLE_KEYS_URL = "https://appleid.apple.com/auth/keys"
 
+def verify_kakao_idToken(idToken: str, aud:str):
+    try:
+
+        jwks_url = "https://kauth.kakao.com/.well-known/jwks.json"
+
+        # 2. PyJWT의 JWK Client로 서명 검증을 위한 공개키 가져오기
+        jwk_client = PyJWKClient(jwks_url)
+        signing_key = jwk_client.get_signing_key_from_jwt(idToken)
+
+        # 3. 검증 옵션 설정
+        decoded = jwt.decode(
+            idToken,
+            signing_key.key,
+            algorithms=["RS256"],
+            audience=aud,             
+            issuer="https://kauth.kakao.com" 
+        )
+
+        return decoded 
+
+    except jwt.ExpiredSignatureError:
+        print("❌ 토큰 만료")
+    except jwt.InvalidAudienceError:
+        print("❌ Audience(client_id) 불일치")
+    except jwt.InvalidIssuerError:
+        print("❌ Issuer 불일치")
+    except Exception as e:
+        print("❌ 토큰 검증 실패:", e)
+
+    return None
 
 def verify_apple_token(identity_token: str):
     res = requests.get(APPLE_KEYS_URL)
@@ -55,6 +86,8 @@ class SocialLoginView(APIView):
         try:
             if provider == "apple":
                 user_info = verify_apple_token(token)
+            elif provider == "kakao":
+                user_info = verify_kakao_idToken(token, "com.yoy0zmaps.rovoc")
             else:
                 return Response({"error": "Unsupported provider"}, status=400)
         except Exception as e:
