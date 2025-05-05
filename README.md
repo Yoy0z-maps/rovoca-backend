@@ -1,3 +1,9 @@
+# EC2 접속 커멘드
+
+```bash
+ssh -i "rovoca.pem" ec2-user@ec2-54-180-57-195.ap-northeast-2.compute.amazonaws.com
+```
+
 # Social Login 응답 JSON
 
 - Kakao Authentication
