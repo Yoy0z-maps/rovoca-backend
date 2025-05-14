@@ -91,7 +91,7 @@ Description=gunicorn daemon for rovoca
 After=network.target
 
 [Service]
-User=ec2-user
+User=nginx
 Group=nginx
 WorkingDirectory=/home/ec2-user/rovoca-backend
 ExecStart=/home/ec2-user/rovoca-backend/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/ec2-user/rovoca-backend/gunicorn.sock rovoca.wsgi:application
