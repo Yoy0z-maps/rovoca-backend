@@ -1,8 +1,9 @@
-from rest_framework import routers
-from .views import WordView, WordbookView
+from django.urls import path
+from .views import SocialLoginView, UserProfileUpdateView
+from .views import MeView
 
-router = routers.SimpleRouter()
-router.register('wordbooks', WordbookView)
-router.register('words', WordView)
-
-urlpatterns = router.urls
+urlpatterns = [
+    path("auth/social-login/", SocialLoginView.as_view(), name="social-login"),
+    path("user/profile/", UserProfileUpdateView.as_view(), name="user-profile-update"),
+    path("user/me/", MeView.as_view(), name="user-me"),
+]

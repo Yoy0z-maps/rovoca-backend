@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'storages',
     'rest_framework_simplejwt.token_blacklist',
+    'word',
 ]
 
 MIDDLEWARE = [

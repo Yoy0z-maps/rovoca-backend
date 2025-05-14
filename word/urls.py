@@ -1,12 +1,31 @@
+from django.urls import path
+from .views import WordView, WordbookView
 
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import WordbookView, WordView
+wordbook_list = WordbookView.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+wordbook_detail = WordbookView.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
 
-router = DefaultRouter()
-router.register(r'wordbooks', WordbookView, basename='wordbook')
-router.register(r'words', WordView, basename='word')
+word_list = WordView.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+word_detail = WordView.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('wordbooks/', wordbook_list, name='wordbook-list'),
+    path('wordbooks/<int:pk>/', wordbook_detail, name='wordbook-detail'),
+    path('words/', word_list, name='word-list'),
+    path('words/<int:pk>/', word_detail, name='word-detail'),
 ]
