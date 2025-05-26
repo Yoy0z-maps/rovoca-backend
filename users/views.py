@@ -78,16 +78,16 @@ def verify_apple_token(identity_token: str):
 class SocialLoginView(APIView):
     def post(self, request):
         provider = request.data.get("provider")
-        token = request.data.get("access_token")
+        credential = request.data.get("result")
 
-        if not provider or not token:
+        if not provider or not credential:
             return Response({"error": "Missing fields"}, status=400)
 
         try:
             if provider == "apple":
-                user_info = verify_apple_token(token)
+                user_info = verify_apple_token(credential["identityToken"])
             elif provider == "kakao":
-                user_info = verify_kakao_idToken(token, "com.yoy0zmaps.rovoc")
+                user_info = verify_kakao_idToken(credential["idToken"], "com.yoy0zmaps.rovoc")
             else:
                 return Response({"error": "Unsupported provider"}, status=400)
         except Exception as e:
@@ -102,10 +102,14 @@ class SocialLoginView(APIView):
 
         # JWT 발급
         refresh = RefreshToken.for_user(user)
+
+        user_data = UserSerializer(user).data
+
         return Response({
             "access": str(refresh.access_token),
             "refresh": str(refresh),
-            "is_new_user": created
+            "is_new_user": created,
+            "user": user_data
         })
     
 from rest_framework.generics import UpdateAPIView
