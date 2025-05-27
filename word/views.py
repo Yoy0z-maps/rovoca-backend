@@ -39,3 +39,13 @@ class WordView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=False, methods=['get'], url_path='search')
+    def search_word(self, request):
+        search_text = request.query_params.get('text', '')
+        if not search_text:
+            return Response({'error': '검색어를 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        words = self.get_queryset().filter(text__icontains=search_text)
+        serializer = self.get_serializer(words, many=True)
+        return Response(serializer.data)
