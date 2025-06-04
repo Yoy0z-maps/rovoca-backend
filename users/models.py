@@ -1,6 +1,8 @@
 # users/models.py
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.timezone import now
+
 
 # Create your models here.
 
@@ -21,6 +23,9 @@ class User(AbstractUser):
     score = models.IntegerField(default=0)
     last_active_date = models.DateField(null=True, blank=True)
     streak = models.IntegerField(default=0)
+
+    play_count = models.IntegerField(default=0)
+    last_played_date = models.DateField(default=now)
 
     USERNAME_FIELD = "social_id"
     REQUIRED_FIELDS = []  # createsuperuser 만들 때 꼭 있어야 함

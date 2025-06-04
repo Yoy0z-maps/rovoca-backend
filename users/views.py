@@ -137,3 +137,74 @@ class MeView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
+    
+
+from datetime import date
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+class GameStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        today = date.today()
+
+        if user.last_played_date != today:
+            user.play_count = 0
+            user.last_played_date = today
+            user.save()
+
+        remaining = max(0, 5 - user.play_count)
+
+        return Response({
+            "can_play": remaining > 0,
+            "remaining": remaining,
+            "max": 5
+        })
+    
+class GamePlayView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        today = date.today()
+
+        if user.last_played_date != today:
+            user.play_count = 0
+            user.last_played_date = today
+
+        if user.play_count >= 5:
+            return Response({"can_play": False, "reason": "limit_reached"}, status=403)
+
+        user.play_count += 1
+        user.save()
+
+        return Response({
+            "can_play": True,
+            "remaining": max(0, 5 - user.play_count)
+        })
+    
+class AdRewardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        today = date.today()
+
+        if user.last_played_date != today:
+            user.play_count = 0
+            user.last_played_date = today
+
+        if user.play_count >= 10:
+            return Response({"can_play": False, "reason": "max_limit_reached"}, status=403)
+
+        # 실제로는 광고 SDK 결과를 검증해야 함 (생략)
+        user.play_count += 1
+        user.save()
+
+        return Response({
+            "can_play": True,
+            "remaining": max(0, 10 - user.play_count)
+        })
