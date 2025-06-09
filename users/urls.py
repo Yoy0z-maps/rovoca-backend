@@ -1,13 +1,14 @@
 from django.urls import path
 from .views import (
     SocialLoginView, UserProfileUpdateView, MeView,
-    GameStatusView, GamePlayView, AdRewardView
+    GameStatusView, GamePlayView, AdRewardView, UserDeleteView
 )
 
 urlpatterns = [
     path("auth/social-login/", SocialLoginView.as_view(), name="social-login"),
     path("user/profile/", UserProfileUpdateView.as_view(), name="user-profile-update"),
     path("user/me/", MeView.as_view(), name="user-me"),
+    path("user/delete/", UserDeleteView.as_view(), name="user-delete"),
 
     path("game/status/", GameStatusView.as_view(), name="game-status"),
     path("game/start/", GamePlayView.as_view(), name="game-start"),

@@ -208,3 +208,26 @@ class AdRewardView(APIView):
             "can_play": True,
             "remaining": max(0, 10 - user.play_count)
         })
+
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+from django.db import transaction
+
+class UserDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+
+        with transaction.atomic():
+            tokens = OutstandingToken.objects.filter(user=user)
+            for token in tokens:
+                try:
+                    BlacklistedToken.objects.get(token=token).delete()
+                except BlacklistedToken.DoesNotExist:
+                    pass
+                token.delete()
+
+            user.delete()
+
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
