@@ -100,6 +100,12 @@ ExecStart=/home/ec2-user/rovoca-backend/venv/bin/gunicorn --access-logfile - --w
 WantedBy=multi-user.target
 ```
 
+### 코드 패치 후 Gunicorn 재시작
+
+```bash
+sudo systemctl restart gunicorn
+```
+
 # Nginx 설치 및 설정
 
 ```bash
