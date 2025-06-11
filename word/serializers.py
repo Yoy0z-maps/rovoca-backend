@@ -5,7 +5,7 @@ class WordbookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wordbook
         fields = '__all__'
-        read_only_fields = ['id', 'created_at']
+        read_only_fields = ['id', 'created_at', 'user']
 
 class WordSerializer(serializers.ModelSerializer):
     class Meta:
