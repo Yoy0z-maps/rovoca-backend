@@ -4,6 +4,12 @@
 ssh -i "rovoca.pem" ec2-user@ec2-54-180-57-195.ap-northeast-2.compute.amazonaws.com
 ```
 
+# Djang Error Log 확인 명령어
+
+```bash
+sudo journalctl -u gunicorn -n 100 --no-pager
+```
+
 # Social Login 응답 JSON
 
 - Kakao Authentication
