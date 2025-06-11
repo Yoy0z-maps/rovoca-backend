@@ -16,6 +16,13 @@ class WordbookView(viewsets.ModelViewSet):
     def get_queryset(self):
         return Wordbook.objects.filter(user=self.request.user)
     
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.views += 1  # 조회수 증가
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+    
     @action(detail=True, methods=['post'], url_path='important')
     def important_wordbook(self, request, pk=None): # Django REST Framework에서 @action으로 커스텀 액션을 만들면, 내부적으로 APIView의 def post(self, request, *args, **kwargs) 같은 구조를 따르기 때문에, DRF가 해당 뷰 메소드를 실행할 때 request를 꼭 넘겨줌.
         try:

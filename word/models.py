@@ -16,8 +16,11 @@ class Wordbook(models.Model):
     is_important = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to=wordbook_image_path, default='rovoca/default.jpg')
+    views = models.PositiveIntegerField(default=0) 
 
-
+    @property
+    def word_count(self):
+        return self.words.count() 
 
     def __str__(self):
         return f"{self.user.nickname}의 {self.name}"
