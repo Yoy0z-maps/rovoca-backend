@@ -5,12 +5,18 @@ import uuid
 from django.db import models
 from users.models import User
 
+def wordbook_image_path(instance):  
+        return f'wordbook/{instance.user.id}'
+
 class Wordbook(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wordbooks')
     name = models.CharField(max_length=128)
     is_important = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to=wordbook_image_path, default='rovoca/default.jpg')
+
+
 
     def __str__(self):
         return f"{self.user.nickname}의 {self.name}"
