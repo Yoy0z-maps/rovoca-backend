@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 class WordbookView(viewsets.ModelViewSet):
     serializer_class = WordbookSerializer
-    authentication_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -37,7 +37,7 @@ class WordbookView(viewsets.ModelViewSet):
 
 class WordView(viewsets.ModelViewSet):
     serializer_class = WordSerializer
-    authentication_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
