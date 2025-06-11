@@ -44,9 +44,13 @@ ALLOWED_HOSTS = ['54.180.57.195', '127.0.0.1', 'localhost', 'api.rovoca.site']
 
 
 REST_FRAMEWORK = {
-    # JWT 인증 활성화
+    # JWT 인증 활성화 (사용자가 누구인가)
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    # 누가 접근이 가능한가 (request.user)
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
     ),
     # 필터 백엔드 활성화
     'DEFAULT_FILTER_BACKENDS': [
