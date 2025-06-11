@@ -7,10 +7,6 @@ class WordbookSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['id', 'created_at']
 
-    def create(self, validated_data):
-        user = self.context['request'].user
-        return Wordbook.objects.create(user=user, **validated_data)
-
 class WordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Word
