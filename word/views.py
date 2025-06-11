@@ -4,9 +4,12 @@ from .models import Word, Wordbook
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
+from .serializers import WordbookSerializer, WordSerializer
 
 # Create your views here.
 class WordbookView(viewsets.ModelViewSet):
+    serializer_class = WordbookSerializer
+    
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
     
@@ -24,6 +27,8 @@ class WordbookView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class WordView(viewsets.ModelViewSet):
+    serializer_class = WordSerializer
+    
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
     
@@ -31,7 +36,7 @@ class WordView(viewsets.ModelViewSet):
        return Word.objects.filter(wordbook__user=self.request.user)
     
     @action(detail=True, methods=['post'], url_path='important')
-    def important_word(self):
+    def important_word(self, request, pk=None):
         try:
             word = self.get_object()
             word.is_important = True
