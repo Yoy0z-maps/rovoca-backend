@@ -29,7 +29,7 @@ class WordbookView(viewsets.ModelViewSet):
     def important_wordbook(self, request, pk=None): # Django REST Framework에서 @action으로 커스텀 액션을 만들면, 내부적으로 APIView의 def post(self, request, *args, **kwargs) 같은 구조를 따르기 때문에, DRF가 해당 뷰 메소드를 실행할 때 request를 꼭 넘겨줌.
         try:
             wordbook = self.get_object()
-            wordbook.is_important = True
+            wordbook.is_important = not wordbook.is_important
             wordbook.save()
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
