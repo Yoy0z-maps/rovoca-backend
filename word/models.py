@@ -5,8 +5,8 @@ import uuid
 from django.db import models
 from users.models import User
 
-def wordbook_image_path(instance):  
-        return f'wordbook/{instance.user.id}'
+def wordbook_image_path(instance, filename):  
+    return f'wordbook/{instance.user.id}/{filename}'
 
 class Wordbook(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
