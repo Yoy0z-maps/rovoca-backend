@@ -40,7 +40,7 @@ class WordView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save()
     
     def get_queryset(self):
        return Word.objects.filter(wordbook__user=self.request.user)
