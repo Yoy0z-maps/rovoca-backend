@@ -42,8 +42,16 @@ class WordView(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
     
-    def get_queryset(self):
-       return Word.objects.filter(wordbook__user=self.request.user)
+def get_queryset(self):
+    # 유저에 속한 모든 단어
+    queryset = Word.objects.filter(wordbook__user=self.request.user)
+    
+    # wordbook 파라미터가 있으면 해당 워드북의 단어들만 필터링
+    wordbook_id = self.request.query_params.get('wordbook')
+    if wordbook_id:
+        queryset = queryset.filter(wordbook=wordbook_id)
+    
+    return queryset
     
     @action(detail=True, methods=['post'], url_path='important')
     def important_word(self, request, pk=None):
