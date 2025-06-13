@@ -7,11 +7,10 @@ from jwt.algorithms import RSAAlgorithm
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 from .serializers import UserSerializer
-
 
 APPLE_KEYS_URL = "https://appleid.apple.com/auth/keys"
 
@@ -76,6 +75,9 @@ def verify_apple_token(identity_token: str):
 
 
 class SocialLoginView(APIView):
+    # settings.py에서 DEFAULT_PERMISSION_CLASSES를 정의했기 때문에 소셜 로그인은 AllowAny 권한 필요
+    permission_classes = [AllowAny]
+
     def post(self, request):
         provider = request.data.get("provider")
         credential = request.data.get("result")
