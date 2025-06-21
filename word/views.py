@@ -63,6 +63,13 @@ class WordView(viewsets.ModelViewSet):
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
+    @action(detail=False, methods=['get'], url_path='recent')
+    def recent_words(self, request):
+        # 최근에 추가된 단어 5개를 가져옴
+        recent_words = self.get_queryset().order_by('-created_at')[:5]
+        serializer = self.get_serializer(recent_words, many=True)
+        return Response(serializer.data)
+        
     @action(detail=False, methods=['get'], url_path='search')
     def search_word(self, request):
         search_text = request.query_params.get('text', '')
