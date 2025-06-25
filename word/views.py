@@ -69,6 +69,21 @@ class WordView(viewsets.ModelViewSet):
         recent_words = self.get_queryset().order_by('-created_at')[:5]
         serializer = self.get_serializer(recent_words, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], url_path='date')
+    def words_by_date(self, request):
+        date_str = request.query_params.get('date')
+        if not date_str:
+            return Response({'error': '날짜를 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            from datetime import datetime
+            target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            words = self.get_queryset().filter(created_at__date=target_date)
+            serializer = self.get_serializer(words, many=True)
+            return Response(serializer.data)
+        except ValueError:
+            return Response({'error': '올바른 날짜 형식을 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
         
     @action(detail=False, methods=['get'], url_path='search')
     def search_word(self, request):
