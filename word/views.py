@@ -25,6 +25,30 @@ class WordbookView(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
     
+    @action(detail=False, methods=['get'], url_path='id')
+    def get_wordbook_by_id(self, request):
+        wordbook_id = request.query_params.get('wordbook')
+        if not wordbook_id:
+            return Response({'error': '워드북 ID를 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # 워드북 조회수 증가
+            wordbook = Wordbook.objects.get(id=wordbook_id, user=self.request.user)
+            wordbook.views += 1
+            wordbook.save()
+            
+            # 해당 워드북의 단어들 가져오기
+            words = Word.objects.filter(wordbook=wordbook_id)
+            word_serializer = WordSerializer(words, many=True)
+            wordbook_serializer = WordbookSerializer(wordbook)
+            
+            return Response({
+                'wordbook': wordbook_serializer.data,
+                'words': word_serializer.data
+            })
+        except Wordbook.DoesNotExist:
+            return Response({'error': '워드북을 찾을 수 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+    
     @action(detail=True, methods=['post'], url_path='important')
     def important_wordbook(self, request, pk=None): # Django REST Framework에서 @action으로 커스텀 액션을 만들면, 내부적으로 APIView의 def post(self, request, *args, **kwargs) 같은 구조를 따르기 때문에, DRF가 해당 뷰 메소드를 실행할 때 request를 꼭 넘겨줌.
         try:
