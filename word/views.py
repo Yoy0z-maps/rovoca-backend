@@ -81,7 +81,7 @@ class WordView(viewsets.ModelViewSet):
     def important_word(self, request, pk=None):
         try:
             word = self.get_object()
-            word.is_important = True
+            word.is_important = not word.is_important
             word.save()
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
