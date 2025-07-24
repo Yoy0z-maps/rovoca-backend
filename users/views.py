@@ -37,7 +37,10 @@ def verify_kakao_idToken(idToken: str, aud:str):
             issuer="https://kauth.kakao.com" 
         )
 
-        return decoded 
+        return {
+        "id": decoded["sub"],
+        "email": f"{decoded['sub']}@kakao.com"
+        }
 
     except jwt.ExpiredSignatureError:
         print("❌ 토큰 만료")
