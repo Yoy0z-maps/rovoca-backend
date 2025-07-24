@@ -220,16 +220,20 @@ class UserDeleteView(APIView):
     def delete(self, request):
         user = request.user
 
-        with transaction.atomic():
-            tokens = OutstandingToken.objects.filter(user=user)
-            for token in tokens:
-                try:
-                    BlacklistedToken.objects.get(token=token).delete()
-                except BlacklistedToken.DoesNotExist:
-                    pass
-                token.delete()
+        try:
+            with transaction.atomic():
+                # 사용자의 모든 토큰을 블랙리스트에 추가
+                tokens = OutstandingToken.objects.filter(user=user)
+                for token in tokens:
+                    BlacklistedToken.objects.get_or_create(token=token)
+                
+                # 사용자 삭제 (관련된 모든 데이터도 함께 삭제됨)
+                user.delete()
 
-            user.delete()
-
-        user.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            print(f"User delete error: {str(e)}")  # 서버 로그에 출력
+            return Response(
+                {"error": f"사용자 삭제 중 오류가 발생했습니다: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
