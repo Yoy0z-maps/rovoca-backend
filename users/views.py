@@ -11,6 +11,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 from .serializers import UserSerializer
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+aud = os.getenv("KAKAO_AUD")
 
 APPLE_KEYS_URL = "https://appleid.apple.com/auth/keys"
 
@@ -89,7 +94,7 @@ class SocialLoginView(APIView):
             if provider == "apple":
                 user_info = verify_apple_token(credential["identityToken"])
             elif provider == "kakao":
-                user_info = verify_kakao_idToken(credential["idToken"], "com.yoy0zmaps.rovoc")
+                user_info = verify_kakao_idToken(credential["idToken"], aud)
             else:
                 return Response({"error": "Unsupported provider"}, status=400)
         except Exception as e:
