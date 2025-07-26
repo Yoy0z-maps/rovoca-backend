@@ -145,8 +145,21 @@ class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data)
+        user = request.user
+        
+        # 기본 사용자 정보
+        user_data = UserSerializer(user).data
+        
+        # Wordbook과 Word 개수 계산
+        wordbook_count = user.wordbooks.count()
+        word_count = sum(wordbook.word_count for wordbook in user.wordbooks.all())
+        
+        # 응답에 추가
+        response_data = user_data.copy()
+        response_data['wordbook_count'] = wordbook_count
+        response_data['word_count'] = word_count
+        
+        return Response(response_data)
     
 
 from datetime import date
