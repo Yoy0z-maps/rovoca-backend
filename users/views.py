@@ -13,6 +13,7 @@ from .models import User
 from .serializers import UserSerializer
 from dotenv import load_dotenv
 import os
+from django.db.models import F
 
 load_dotenv()
 aud = os.getenv("KAKAO_AUD")
@@ -258,3 +259,21 @@ class UserDeleteView(APIView):
                 {"error": f"사용자 삭제 중 오류가 발생했습니다: {str(e)}"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+class ScoreUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        score_change = request.data.get('score_change', 0)
+        
+        # 점수 업데이트
+        User.objects.filter(id=user.id).update(score=F('score') + score_change)
+        
+        # 업데이트된 사용자 정보 반환
+        user.refresh_from_db()
+        
+        return Response({
+            "score": user.score,
+            "message": f"Score updated by {score_change}"
+        })
