@@ -163,7 +163,87 @@ class MeView(APIView):
         return Response(response_data)
     
 
-from datetime import date
+from datetime import date, timedelta
+from django.utils import timezone
+
+class StreakUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        today = date.today()
+        
+        # 마지막 활성 날짜가 오늘이 아닌 경우에만 streak 증가
+        if user.last_active_date != today:
+            # 연속 접속 체크 (어제 접속했는지)
+            yesterday = today - timedelta(days=1)
+            
+            if user.last_active_date == yesterday:
+                # 연속 접속: streak 증가
+                user.streak += 1
+            else:
+                # 연속 접속이 아님: streak 리셋
+                user.streak = 1
+            
+            # 마지막 활성 날짜 업데이트
+            user.last_active_date = today
+            user.save()
+            
+            return Response({
+                "streak": user.streak,
+                "last_active_date": user.last_active_date,
+                "message": "Streak updated successfully"
+            })
+        else:
+            # 오늘 이미 접속했음
+            return Response({
+                "streak": user.streak,
+                "last_active_date": user.last_active_date,
+                "message": "Already updated today"
+            }, status=200)
+
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+class ActivityView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        today = date.today()
+        
+        # last_active_date 업데이트 및 streak 계산
+        if user.last_active_date != today:
+            # 연속 접속 체크 (어제 접속했는지)
+            yesterday = today - timedelta(days=1)
+            
+            if user.last_active_date == yesterday:
+                # 연속 접속: streak 증가
+                user.streak += 1
+            else:
+                # 연속 접속이 아님: streak 리셋
+                user.streak = 1
+            
+            # 마지막 활성 날짜 업데이트
+            user.last_active_date = today
+            user.save()
+            
+            return Response({
+                "streak": user.streak,
+                "last_active_date": user.last_active_date,
+                "streak_updated": True,
+                "message": "Activity recorded and streak updated"
+            })
+        else:
+            # 오늘 이미 접속했음
+            return Response({
+                "streak": user.streak,
+                "last_active_date": user.last_active_date,
+                "streak_updated": False,
+                "message": "Activity recorded (already active today)"
+            })
+
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
