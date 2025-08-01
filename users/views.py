@@ -357,3 +357,12 @@ class ScoreUpdateView(APIView):
             "score": user.score,
             "message": f"Score updated by {score_change}"
         })
+
+class ExpoPushTokenUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        expo_push_token = request.data.get('expo_push_token')
+        User.objects.filter(id=user.id).update(expo_push_token=expo_push_token)
+        return Response({"message": "Expo push token updated"})

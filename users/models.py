@@ -19,6 +19,7 @@ class User(AbstractUser):
     nickname = models.CharField(max_length=128)
     profile_image = models.URLField(null=True, blank=True) # 추후 프로필 이미지 업로드 시 사용
     created_at = models.DateTimeField(auto_now_add=True)
+    expo_push_token = models.CharField(max_length=255, null=True, blank=True)
 
     score = models.IntegerField(default=0)
     last_active_date = models.DateField(null=True, blank=True)

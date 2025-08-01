@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     SocialLoginView, UserProfileUpdateView, MeView,
-    GameStatusView, GamePlayView, AdRewardView, UserDeleteView, ScoreUpdateView, StreakUpdateView, ActivityView
+    GameStatusView, GamePlayView, AdRewardView, UserDeleteView, ScoreUpdateView, StreakUpdateView, ActivityView, ExpoPushTokenUpdateView
 )
 
 urlpatterns = [
@@ -11,6 +11,7 @@ urlpatterns = [
     path("user/delete/", UserDeleteView.as_view(), name="user-delete"),
 
     path("user/score/", ScoreUpdateView.as_view(), name="user-score-update"),
+    path("user/expo-push-token/", ExpoPushTokenUpdateView.as_view(), name="user-expo-push-token-update"),
     path("user/streak/", StreakUpdateView.as_view(), name="user-streak-update"),
     path("user/activity/", ActivityView.as_view(), name="user-activity"),
 
