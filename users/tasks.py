@@ -1,8 +1,8 @@
 # user/tasks.py
 
-from django.utils import timezone
+from django.utils import timezone as dj_timezone  # 수정
 from datetime import timedelta
-from .models import User
+from django.db.models import Q
 from word.models import Word
 import requests
 import random
@@ -82,8 +82,6 @@ def send_push_with_word():
                 #     selected_word = user_words.order_by('created_at').first()
                 #     word_type = "오래된"
                 selected_word = user_words[random.randint(0, user_words.count() - 1)]
-                
-                print(f"🎲 {word_type} 단어 선택: {selected_word.text}")
                 
                 # 선택된 단어의 첫 번째 의미 가져오기
                 first_meaning = selected_word.meanings[0]['definition'] if selected_word.meanings else "의미 없음"
