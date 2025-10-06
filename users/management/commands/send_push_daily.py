@@ -1,6 +1,6 @@
 # yourapp/management/commands/sendpush_daily.py
 from django.core.management.base import BaseCommand
-from yourapp.push import send_push_with_word  # 네가 쓰는 함수 import
+from users.tasks import send_push_with_word 
 
 class Command(BaseCommand):
     help = "매일 단어 푸시 전송"
