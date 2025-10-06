@@ -3,7 +3,7 @@
 from django.utils import timezone as dj_timezone  # 수정
 from datetime import timedelta
 from django.db.models import Q
-from django.db.models import User
+from .models import User
 from word.models import Word
 import requests
 import random
