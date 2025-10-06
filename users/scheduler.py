@@ -1,5 +1,5 @@
 # user/scheduler.py
-
+from .tasks import send_push_to_all_users, send_push_to_inactive_users, send_push_with_word
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.triggers.cron import CronTrigger
@@ -32,7 +32,7 @@ def start():
         )
 
         # 잡 등록
-        _scheduler_instance.add_job(send_push_with_word, CronTrigger(hour=23, minute=32))
+        _scheduler_instance.add_job(send_push_with_word, CronTrigger(hour=23, minute=34))
         _scheduler_instance.add_job(send_push_to_all_users, CronTrigger(hour=20, minute=0))
         _scheduler_instance.add_job(send_push_to_inactive_users, CronTrigger(hour=22, minute=0))
 
