@@ -45,9 +45,11 @@ def send_push_to_all_users():
         print("❌ 예외 발생:", e)
 
 def send_push_to_inactive_users():
-    now = timezone.now()
-    threshold = now - timedelta(hours=24)
-    users = User.objects.filter(last_active_at__lt=threshold).exclude(expo_push_token__isnull=True).exclude(expo_push_token="")
+    cutoff_date = dj_timezone.now().date() - timedelta(days=1)  # 24시간 기준
+    users = (User.objects
+             .filter(Q(last_active_date__lt=cutoff_date) | Q(last_active_date__isnull=True))
+             .exclude(expo_push_token__isnull=True)
+             .exclude(expo_push_token=""))
     for user in users:
         send_push_notification(user.expo_push_token, "ROVOCA", "오늘 하루 빠졌어요! 지금 들어와서 복습해요 📚")
 
@@ -71,14 +73,15 @@ def send_push_with_word():
                 message = "단어를 등록하고 학습을 시작하세요!"
             else:
                 # 1/2 확률로 최근 단어 또는 오래된 단어 선택
-                if random.choice([True, False]):
-                    # 가장 최근 단어 (created_at 기준 내림차순)
-                    selected_word = user_words.order_by('-created_at').first()
-                    word_type = "최근"
-                else:
-                    # 가장 오래된 단어 (created_at 기준 오름차순)
-                    selected_word = user_words.order_by('created_at').first()
-                    word_type = "오래된"
+                # if random.choice([True, False]):
+                #     # 가장 최근 단어 (created_at 기준 내림차순)
+                #     selected_word = user_words.order_by('-created_at').first()
+                #     word_type = "최근"
+                # else:
+                #     # 가장 오래된 단어 (created_at 기준 오름차순)
+                #     selected_word = user_words.order_by('created_at').first()
+                #     word_type = "오래된"
+                selected_word = user_words[random.randint(0, user_words.count() - 1)]
                 
                 print(f"🎲 {word_type} 단어 선택: {selected_word.text}")
                 
