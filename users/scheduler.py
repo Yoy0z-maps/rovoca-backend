@@ -31,7 +31,7 @@ def start():
         _scheduler_instance = BackgroundScheduler(timezone=timezone("Asia/Seoul"))
 
         # 오전 8시 가장 오래된 / 최근 단어 알림
-        _scheduler_instance.add_job(send_push_with_word, CronTrigger(hour=23, minute=16))
+        _scheduler_instance.add_job(send_push_with_word, CronTrigger(hour=23, minute=25))
 
         # 오후 8시 전체 유저 복습 알림
         _scheduler_instance.add_job(send_push_to_all_users, CronTrigger(hour=20, minute=0))
