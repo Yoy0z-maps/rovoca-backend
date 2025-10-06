@@ -54,8 +54,12 @@ def send_push_to_inactive_users():
     for user in users:
         send_push_notification(user.expo_push_token, "ROVOCA", "오늘 하루 빠졌어요! 지금 들어와서 복습해요 📚")
 
+import os, threading
+from django.utils import timezone as dj_timezone
+
 def send_push_with_word():
     print("🚀 send_push_with_word() 실행됨")
+    print(f"[JOB send_push_with_word] pid={os.getpid()} tid={threading.get_ident()} {dj_timezone.now().isoformat()}", flush=True)
 
     try:
         users = User.objects.exclude(expo_push_token__isnull=True).exclude(expo_push_token="")
