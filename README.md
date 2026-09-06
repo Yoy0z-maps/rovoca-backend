@@ -1,3 +1,9 @@
+# GCP 이전
+
+Cloud Run + private `e2-micro` PostgreSQL + Cloud Storage 배포 구성은
+[`infra/gcp/README.md`](infra/gcp/README.md)를 참고하세요. 기존 AWS 운영 환경은
+GCP 검증과 데이터 전환이 끝날 때까지 롤백 용도로 유지합니다.
+
 # EC2 접속 커멘드 Amazon Linux 2
 
 ```bash

@@ -17,8 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
+from rovoca.health import health, readiness
 
 urlpatterns = [
+    path("health/", health, name="health"),
+    path("ready/", readiness, name="readiness"),
     path('admin/', admin.site.urls),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path('users/', include('users.urls')),

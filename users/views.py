@@ -1,5 +1,6 @@
 # views.py
 
+import logging
 import requests
 import jwt
 from jwt import PyJWKClient
@@ -15,47 +16,56 @@ from dotenv import load_dotenv
 import os
 from django.db.models import F
 
+logger = logging.getLogger(__name__)
+
 load_dotenv()
 aud = os.getenv("KAKAO_AUD")
+google_aud = os.getenv("GOOGLE_AUD")
 
 APPLE_KEYS_URL = "https://appleid.apple.com/auth/keys"
+GOOGLE_KEYS_URL = "https://www.googleapis.com/oauth2/v3/certs"
 
 def verify_kakao_idToken(idToken: str, aud:str):
-    try:
+    if not aud:
+        raise ValueError("KAKAO_AUD is not configured.")
 
-        jwks_url = "https://kauth.kakao.com/.well-known/jwks.json"
+    jwk_client = PyJWKClient("https://kauth.kakao.com/.well-known/jwks.json")
+    signing_key = jwk_client.get_signing_key_from_jwt(idToken)
+    decoded = jwt.decode(
+        idToken,
+        signing_key.key,
+        algorithms=["RS256"],
+        audience=aud,
+        issuer="https://kauth.kakao.com"
+    )
 
-        # 2. PyJWT의 JWK Client로 서명 검증을 위한 공개키 가져오기
-        jwk_client = PyJWKClient(jwks_url)
-        signing_key = jwk_client.get_signing_key_from_jwt(idToken)
-
-        # 3. 검증 옵션 설정
-        decoded = jwt.decode(
-            idToken,
-            signing_key.key,
-            algorithms=["RS256"],
-            audience=aud,             
-            issuer="https://kauth.kakao.com" 
-        )
-
-        return {
+    return {
         "id": decoded["sub"],
         "email": f"{decoded['sub']}@kakao.com"
-        }
+    }
 
-    except jwt.ExpiredSignatureError:
-        print("❌ 토큰 만료")
-    except jwt.InvalidAudienceError:
-        print("❌ Audience(client_id) 불일치")
-    except jwt.InvalidIssuerError:
-        print("❌ Issuer 불일치")
-    except Exception as e:
-        print("❌ 토큰 검증 실패:", e)
 
-    return None
+def verify_google_id_token(id_token: str, audience: str):
+    if not audience:
+        raise ValueError("GOOGLE_AUD is not configured.")
+
+    jwk_client = PyJWKClient(GOOGLE_KEYS_URL)
+    signing_key = jwk_client.get_signing_key_from_jwt(id_token)
+    decoded = jwt.decode(
+        id_token,
+        signing_key.key,
+        algorithms=["RS256"],
+        audience=audience,
+        issuer=["accounts.google.com", "https://accounts.google.com"],
+    )
+    return {
+        "id": decoded["sub"],
+        "email": decoded.get("email"),
+    }
 
 def verify_apple_token(identity_token: str):
-    res = requests.get(APPLE_KEYS_URL)
+    res = requests.get(APPLE_KEYS_URL, timeout=5)
+    res.raise_for_status()
     apple_keys = res.json()["keys"]
     headers = jwt.get_unverified_header(identity_token)
     kid = headers["kid"]
@@ -74,8 +84,6 @@ def verify_apple_token(identity_token: str):
         audience="com.yoy0zmaps.rovoc",
         issuer="https://appleid.apple.com"
     )
-
-    print(decoded)
 
     return {
         "id": decoded["sub"],
@@ -99,10 +107,14 @@ class SocialLoginView(APIView):
                 user_info = verify_apple_token(credential["identityToken"])
             elif provider == "kakao":
                 user_info = verify_kakao_idToken(credential["idToken"], aud)
+            elif provider == "google":
+                user_info = verify_google_id_token(
+                    credential["idToken"], google_aud
+                )
             else:
                 return Response({"error": "Unsupported provider"}, status=400)
-        except Exception as e:
-            return Response({"error": str(e)}, status=401)
+        except (KeyError, TypeError, ValueError, jwt.PyJWTError, requests.RequestException):
+            return Response({"error": "Invalid social login credential"}, status=401)
 
         # 유저 찾거나 생성
         user, created = User.objects.get_or_create(
@@ -321,6 +333,7 @@ class UserDeleteView(APIView):
 
     def delete(self, request):
         user = request.user
+        user_id = user.pk
 
         try:
             with transaction.atomic():
@@ -333,10 +346,10 @@ class UserDeleteView(APIView):
                 user.delete()
 
             return Response(status=status.HTTP_204_NO_CONTENT)
-        except Exception as e:
-            print(f"User delete error: {str(e)}")  # 서버 로그에 출력
+        except Exception:
+            logger.exception("User deletion failed for user_id=%s", user_id)
             return Response(
-                {"error": f"사용자 삭제 중 오류가 발생했습니다: {str(e)}"}, 
+                {"error": "사용자 삭제 중 오류가 발생했습니다."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
